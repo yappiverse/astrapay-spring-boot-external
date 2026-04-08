@@ -11,5 +11,5 @@ public interface NoteService {
 
     NoteDto createNote(NoteRequestDto request);
 
-    void deleteNote(Long id);
+    void deleteNote(String id);
 }

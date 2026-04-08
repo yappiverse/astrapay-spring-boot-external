@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 public class NoteServiceImpl implements NoteService {
 
     private final List<Note> notes = new ArrayList<>();
-    private final AtomicLong idCounter = new AtomicLong(1);
 
     @Override
     public List<NoteDto> getAllNotes() {
@@ -31,7 +30,7 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public NoteDto createNote(NoteRequestDto request) {
         Note note = Note.builder()
-                .id(idCounter.getAndIncrement())
+                .id(UUID.randomUUID().toString())
                 .title(request.getTitle())
                 .content(request.getContent())
                 .createdAt(LocalDateTime.now())
@@ -42,7 +41,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public void deleteNote(Long id) {
+    public void deleteNote(String id) {
         Note note = notes.stream()
                 .filter(n -> n.getId().equals(id))
                 .findFirst()

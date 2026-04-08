@@ -46,7 +46,7 @@ class NoteControllerTest {
     @Test
     void getAllNotes_returnsListOfNotes() throws Exception {
         NoteDto note = NoteDto.builder()
-                .id(1L)
+                .id("uuid-1")
                 .title("Judul")
                 .content("Isi")
                 .createdAt(LocalDateTime.now())
@@ -55,7 +55,7 @@ class NoteControllerTest {
 
         mockMvc.perform(get("/api/notes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].id").value("uuid-1"))
                 .andExpect(jsonPath("$[0].title").value("Judul"))
                 .andExpect(jsonPath("$[0].content").value("Isi"));
     }
@@ -67,7 +67,7 @@ class NoteControllerTest {
         request.setContent("Isi Catatan");
 
         NoteDto response = NoteDto.builder()
-                .id(1L)
+                .id("uuid-1")
                 .title("Judul Baru")
                 .content("Isi Catatan")
                 .createdAt(LocalDateTime.now())
@@ -78,7 +78,7 @@ class NoteControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.id").value("uuid-1"))
                 .andExpect(jsonPath("$.title").value("Judul Baru"));
     }
 
@@ -121,17 +121,17 @@ class NoteControllerTest {
 
     @Test
     void deleteNote_existingId_returns204() throws Exception {
-        doNothing().when(noteService).deleteNote(1L);
+        doNothing().when(noteService).deleteNote("uuid-1");
 
-        mockMvc.perform(delete("/api/notes/1"))
+        mockMvc.perform(delete("/api/notes/uuid-1"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void deleteNote_nonExistingId_returns404() throws Exception {
-        doThrow(new NoteNotFoundException(999L)).when(noteService).deleteNote(999L);
+        doThrow(new NoteNotFoundException("non-existing-id")).when(noteService).deleteNote("non-existing-id");
 
-        mockMvc.perform(delete("/api/notes/999"))
+        mockMvc.perform(delete("/api/notes/non-existing-id"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").exists());
     }

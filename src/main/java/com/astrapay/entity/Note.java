@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Note {
-    private Long id;
+    private String id;
     private String title;
     private String content;
     private LocalDateTime createdAt;

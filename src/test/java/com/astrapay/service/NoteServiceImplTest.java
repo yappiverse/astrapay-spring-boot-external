@@ -82,6 +82,6 @@ class NoteServiceImplTest {
 
     @Test
     void deleteNote_nonExistingId_throwsNoteNotFoundException() {
-        assertThrows(NoteNotFoundException.class, () -> noteService.deleteNote(999L));
+        assertThrows(NoteNotFoundException.class, () -> noteService.deleteNote("non-existing-id"));
     }
 }

@@ -55,7 +55,7 @@ public class NoteController {
             @ApiResponse(code = 204, message = "No Content"),
             @ApiResponse(code = 404, message = "Not Found")
     })
-    public ResponseEntity<Void> deleteNote(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteNote(@PathVariable String id) {
         log.info("DELETE /api/notes/{}", id);
         noteService.deleteNote(id);
         return ResponseEntity.noContent().build();
