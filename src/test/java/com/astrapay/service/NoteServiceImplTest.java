@@ -3,6 +3,7 @@ package com.astrapay.service;
 import com.astrapay.dto.NoteDto;
 import com.astrapay.dto.NoteRequestDto;
 import com.astrapay.exception.NoteNotFoundException;
+import com.astrapay.exception.NoteTitleAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -83,5 +84,36 @@ class NoteServiceImplTest {
     @Test
     void deleteNote_nonExistingId_throwsNoteNotFoundException() {
         assertThrows(NoteNotFoundException.class, () -> noteService.deleteNote("non-existing-id"));
+    }
+
+    @Test
+    void createNote_duplicateTitle_throwsNoteTitleAlreadyExistsException() {
+        NoteRequestDto request = new NoteRequestDto();
+        request.setTitle("Judul Sama");
+        request.setContent("Isi pertama");
+        noteService.createNote(request);
+
+        NoteRequestDto duplicate = new NoteRequestDto();
+        duplicate.setTitle("Judul Sama");
+        duplicate.setContent("Isi kedua");
+
+        assertThrows(NoteTitleAlreadyExistsException.class, () -> noteService.createNote(duplicate));
+    }
+
+    @Test
+    void deleteNoteByTitle_existingTitle_removesNote() {
+        NoteRequestDto request = new NoteRequestDto();
+        request.setTitle("Judul Hapus");
+        request.setContent("Isi");
+        noteService.createNote(request);
+
+        noteService.deleteNoteByTitle("Judul Hapus");
+
+        assertTrue(noteService.getAllNotes().isEmpty());
+    }
+
+    @Test
+    void deleteNoteByTitle_nonExistingTitle_throwsNoteNotFoundException() {
+        assertThrows(NoteNotFoundException.class, () -> noteService.deleteNoteByTitle("Tidak Ada"));
     }
 }

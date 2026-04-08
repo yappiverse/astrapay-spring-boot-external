@@ -3,6 +3,7 @@ package com.astrapay.controller;
 import com.astrapay.dto.NoteDto;
 import com.astrapay.dto.NoteRequestDto;
 import com.astrapay.exception.NoteNotFoundException;
+import com.astrapay.exception.NoteTitleAlreadyExistsException;
 import com.astrapay.service.NoteService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -132,6 +133,41 @@ class NoteControllerTest {
         doThrow(new NoteNotFoundException("non-existing-id")).when(noteService).deleteNote("non-existing-id");
 
         mockMvc.perform(delete("/api/notes/non-existing-id"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    // POST duplicate title → 409 Conflict
+    @Test
+    void createNote_duplicateTitle_returns409() throws Exception {
+        NoteRequestDto request = new NoteRequestDto();
+        request.setTitle("Judul Sama");
+        request.setContent("Isi");
+
+        doThrow(new NoteTitleAlreadyExistsException("Judul Sama"))
+                .when(noteService).createNote(any(NoteRequestDto.class));
+
+        mockMvc.perform(post("/api/notes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    void deleteNoteByTitle_existingTitle_returns204() throws Exception {
+        doNothing().when(noteService).deleteNoteByTitle("Judul Note");
+
+        mockMvc.perform(delete("/api/notes").param("title", "Judul Note"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteNoteByTitle_nonExistingTitle_returns404() throws Exception {
+        doThrow(new NoteNotFoundException("Tidak Ada"))
+                .when(noteService).deleteNoteByTitle("Tidak Ada");
+
+        mockMvc.perform(delete("/api/notes").param("title", "Tidak Ada"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").exists());
     }
