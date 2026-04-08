@@ -12,4 +12,6 @@ public interface NoteService {
     NoteDto createNote(NoteRequestDto request);
 
     void deleteNote(String id);
+
+    void deleteNoteByTitle(String title);
 }

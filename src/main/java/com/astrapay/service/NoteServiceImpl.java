@@ -4,6 +4,7 @@ import com.astrapay.dto.NoteDto;
 import com.astrapay.dto.NoteRequestDto;
 import com.astrapay.entity.Note;
 import com.astrapay.exception.NoteNotFoundException;
+import com.astrapay.exception.NoteTitleAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,11 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     public NoteDto createNote(NoteRequestDto request) {
+        boolean titleExists = notes.stream()
+                .anyMatch(n -> n.getTitle().equalsIgnoreCase(request.getTitle()));
+        if (titleExists) {
+            throw new NoteTitleAlreadyExistsException(request.getTitle());
+        }
         Note note = Note.builder()
                 .id(UUID.randomUUID().toString())
                 .title(request.getTitle())
@@ -48,6 +54,16 @@ public class NoteServiceImpl implements NoteService {
                 .orElseThrow(() -> new NoteNotFoundException(id));
         notes.remove(note);
         log.info("Deleted note with id: {}", id);
+    }
+
+    @Override
+    public void deleteNoteByTitle(String title) {
+        Note note = notes.stream()
+                .filter(n -> n.getTitle().equalsIgnoreCase(title))
+                .findFirst()
+                .orElseThrow(() -> new NoteNotFoundException(title));
+        notes.remove(note);
+        log.info("Deleted note with title: {}", title);
     }
 
     private NoteDto toDto(Note note) {

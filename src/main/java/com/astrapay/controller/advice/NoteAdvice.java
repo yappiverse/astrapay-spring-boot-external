@@ -1,6 +1,7 @@
 package com.astrapay.controller.advice;
 
 import com.astrapay.exception.NoteNotFoundException;
+import com.astrapay.exception.NoteTitleAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -19,6 +20,13 @@ public class NoteAdvice {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(NoteTitleAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateTitle(NoteTitleAlreadyExistsException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

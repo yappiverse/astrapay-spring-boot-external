@@ -60,4 +60,16 @@ public class NoteController {
         noteService.deleteNote(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping
+    @ApiOperation(value = "Delete a note by title")
+    @ApiResponses(value = {
+            @ApiResponse(code = 204, message = "No Content"),
+            @ApiResponse(code = 404, message = "Not Found")
+    })
+    public ResponseEntity<Void> deleteNoteByTitle(@RequestParam String title) {
+        log.info("DELETE /api/notes?title={}", title);
+        noteService.deleteNoteByTitle(title);
+        return ResponseEntity.noContent().build();
+    }
 }
